@@ -10,9 +10,7 @@ class NaiveBayes:
         '''
             Inisialisasi variabel-variabel yang diperlukan
         '''
-        self.class_cond_probs = {}
         self.prior_probs = {}
-        self.data_kinds = []
     
     def fit(self, x, y):
         '''
@@ -38,7 +36,7 @@ class NaiveBayes:
     
     def process_per_label(self):
         '''
-            Melakukan pemrosesan data untuk tiap label (pemisahan data per label, penentuan tipe data)
+            Melakukan pemisahan data per label
         '''
         # Kelompokkan data berdasarkan label
         self.data_per_label = {}
@@ -51,26 +49,6 @@ class NaiveBayes:
 
         for label in self.data_per_label.keys() :
             self.data_per_label[label] = np.array(self.data_per_label[label])
-
-        # Hitung probabilitas data pada masing-masing label
-        boundaries = {}
-        for label in self.data_per_label.keys() :
-            boundaries[label] = []
-            for i in range(len(self.data_per_label.keys())) :
-                if (len(np.unique(self.data_per_label[label][:,i])) > 2) :
-                    # Data kontinu, gunakan gaussian naive bayes
-                    self.data_kinds.append("continous")
-                    currProbs = {}
-                else :
-                    # Data boolean, gunakan perbandingan jumlah
-                    self.data_kinds.append("bool")
-                    currProbs = {}
-                    for j in np.unique(self.data_per_label[label][:,i]) :
-                        currProbs[j] = np.count_nonzero(self.data_per_label[label][:,i] == j)/len(self.data_per_label[label][:,i])
-                
-                boundaries[label].append(currProbs)
-        
-        self.class_cond_probs = boundaries
     
     def prior_probs_init(self):
         '''
@@ -98,13 +76,10 @@ class NaiveBayes:
             for label in np.unique(self.y) :
                 currProb = 1
                 for i in range(len(sample)) :
-                    if (self.data_kinds[i] == "continous") :
-                        # Hitung probabilitas menggunakan fungsi distribusi Gaussian
-                        var = np.var(self.data_per_label[label][:,i]) + epsilon
-                        mean = np.mean(self.data_per_label[label][:,i])
-                        currProb *= self.gaussianDist(sample[i], mean, var)
-                    else :
-                        currProb *= self.class_cond_probs[label][i]
+                    # Hitung probabilitas menggunakan fungsi distribusi Gaussian
+                    var = np.var(self.data_per_label[label][:,i]) + epsilon
+                    mean = np.mean(self.data_per_label[label][:,i])
+                    currProb *= self.gaussianDist(sample[i], mean, var)
                 
                 # Kalikan dengan prior probability label yang bersangkutan
                 currProb *= self.prior_probs[label]
