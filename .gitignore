@@ -1,3 +1,4 @@
 __pycache__
 tuning.ipynb
 predictions-knn*
+knnfromlogreg.py
