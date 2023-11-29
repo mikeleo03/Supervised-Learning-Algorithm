@@ -159,10 +159,10 @@ class NaiveBayes:
         y_pred = []
     
         # Proses kalkulasi utama
-        epsilon = abs(var_smoothing * np.var(x, axis=0).max())
         for sample in x :
             maxLabel = 0
             maxProb = 0    
+            epsilon = var_smoothing * np.var(self.x, axis=0).max()
             for label in np.unique(self.y) :
                 currProb = 1
                 for i in range(len(sample)) :
